@@ -97,6 +97,7 @@ TInstanceHook(void*, "?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@
         if (abnormal)
         {
             logger.warn << "Player(" << sp->getRealName() << ") item data error!" << Logger::endl;
+            __debugbreak();
             return nullptr;
         }
     }
@@ -113,16 +114,16 @@ void FixBugEvent()
 #include <MC/MovementInterpolator.hpp>
 TInstanceHook(ItemActor*, "?_drop@Actor@@IEAAPEBVItemActor@@AEBVItemStack@@_N@Z", Actor, ItemStack* a2, char a3)
 {
-    auto out = dAccess<MovementInterpolator*, 0x510>(this);
-    if (!dAccess<bool, 0x24>(out))
+    auto out = dAccess<MovementInterpolator*, 0x508>(this);
+    if (!dAccess<bool, 0x2c>(out))
     {
-        auto num = dAccess<int, 0x1c>(out);
+        auto num = dAccess<int, 0x20>(out);
         if (num > 0 && num == 1)
         {
-            auto v17 = *(Vec2*)((char*)out + 0x0c);
+            auto v17 = *(Vec2*)((char*)out + 0x14);
             this->setRot(v17);
         }
-        --dAccess<int, 0x1c>(out);
+        --dAccess<int, 0x24>(out);
     }
     return original(this, a2, a3);
 }
@@ -174,4 +175,17 @@ TClasslessInstanceHook(__int64, "?move@ChunkViewSource@@QEAAXAEBVBlockPos@@H_NV?
         pl->setPos(pl->getPosOld());
     }
     return 0;
+}
+
+//fix Wine Stop
+extern bool isWine();
+TClasslessInstanceHook(void, "?leaveGameSync@ServerInstance@@QEAAXXZ")
+{
+    original(this);
+    if (isWine())
+    {
+        std::cerr << "Quit correctly" << std::endl;
+        auto proc = GetCurrentProcess();
+        TerminateProcess(proc, 0);
+    }
 }

@@ -24,7 +24,6 @@
 
 #include <MC/Level.hpp>
 #include <MC/ItemStack.hpp>
-#include <MC/ScriptItemStack.hpp>
 #include <MC/Container.hpp>
 #include <MC/SimpleContainer.hpp>
 #include <MC/Scoreboard.hpp>
@@ -148,7 +147,7 @@ string Player::getDeviceTypeName()
 bool Player::kick(const string& msg) 
 {
     NetworkIdentifier* pNetworkIdentifier = getNetworkIdentifier();
-    Global<Minecraft>->getServerNetworkHandler()->disconnectClient(*pNetworkIdentifier, msg, 0);
+    Global<ServerNetworkHandler>->disconnectClient(*pNetworkIdentifier, msg, 0);
     return true;
 }
 
@@ -229,7 +228,7 @@ bool Player::runcmd(const string& cmd)
 
 Container* Player::getEnderChestContainer() 
 {
-    return dAccess<Container*>(this, 4200);//IDA Player::Player() 782
+    return dAccess<Container*>(this, 4184);//IDA Player::Player() 782
 }
 
 bool Player::transferServer(const string& address, unsigned short port)
@@ -265,11 +264,8 @@ string Player::getUuid()
     auto ueic = getUserEntityIdentifierComponent();
     if (!ueic)
         return "";
-    auto uuid = (void*)((uintptr_t)ueic + 168);
-    string uuidStr;
-    SymCall("?asString@UUID@mce@@QEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ",
-            string*, void*, string*)(uuid, &uuidStr);
-    return uuidStr;
+    auto& uuid = dAccess<mce::UUID>(ueic, 168);
+    return uuid.asString();
 }
 
 unsigned char Player::getClientSubId()

@@ -55,7 +55,6 @@
       <ExceptionHandling>Async</ExceptionHandling>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -67,37 +66,39 @@
       <AdditionalDependencies>$(SolutionDir)LiteLoader\Lib\third-party\leveldb\leveldb.lib;$(SolutionDir)LiteLoader\Lib\third-party\openssl\libcrypto.lib;$(SolutionDir)LiteLoader\Lib\third-party\openssl\libssl.lib;$(TargetDir)Chakra.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>if exist $(TargetDir)LiteLoader.lib (
-    copy /Y $(TargetDir)LiteLoader.lib $(ProjectDir)Lib\
+      <Command>if exist "$(TargetDir)LiteLoader.lib" (
+    copy /Y "$(TargetDir)LiteLoader.lib" "$(ProjectDir)Lib\"
 )
-if exist $(LocalDebuggerWorkingDirectory)\plugins\ (
-    copy /Y $(TargetPath) $(LocalDebuggerWorkingDirectory)\
-)
-			</Command>
+if exist "$(LocalDebuggerWorkingDirectory)\plugins\" (
+    copy /Y "$(TargetPath)" "$(LocalDebuggerWorkingDirectory)\"
+)</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>if not exist $(SolutionDir)LiteLoader\Lib\bedrock_server_api.lib goto process
-if not exist $(SolutionDir)LiteLoader\Lib\bedrock_server_var.lib goto process
+      <Command>if not exist "$(SolutionDir)LiteLoader\Lib\bedrock_server_api.lib" goto process
+if not exist "$(SolutionDir)LiteLoader\Lib\bedrock_server_var.lib" goto process
 goto end
 
 :process
-cd /d $(SolutionDir)Tools
+cd /d "$(SolutionDir)Tools"
 LibraryBuilder.exe
 
 :end</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Kernel\AllowListAPI.cpp" />
     <ClCompile Include="Kernel\Scoreboard\ObjectiveAPI.cpp" />
     <ClCompile Include="Kernel\Utils\DbgHelper.cpp" />
     <ClCompile Include="Kernel\SimulatedPlayerAPI.cpp" />
     <ClCompile Include="Kernel\Utils\STLHelper.cpp" />
+    <ClCompile Include="Main\AddonsHelper.cpp" />
     <ClCompile Include="Main\AutoUpgrade.cpp" />
     <ClCompile Include="Main\BuiltinUnlockCmd.cpp" />
     <ClCompile Include="Main\Config.cpp" />
     <ClCompile Include="Main\CrashLogger.cpp" />
     <ClCompile Include="Main\dllmain.cpp" />
     <ClCompile Include="Main\BuiltinBugFix.cpp" />
+    <ClInclude Include="Header\AllowListAPI.h" />
     <ClInclude Include="Header\Impl\FormPacketHelper.h" />
     <ClInclude Include="Header\Impl\ObjectivePacketHelper.h" />
     <ClInclude Include="Header\LoggerAPI.h" />
@@ -245,6 +246,7 @@ LibraryBuilder.exe
   <ItemGroup>
     <ClInclude Include="Header\Utils\DbgHelper.h" />
     <ClInclude Include="Header\Utils\STLHelper.h" />
+    <ClInclude Include="Main\AddonsHelper.h" />
     <ClInclude Include="Main\AutoUpgrade.h" />
     <ClInclude Include="Main\Config.h" />
     <ClInclude Include="Main\CrashLogger.h" />

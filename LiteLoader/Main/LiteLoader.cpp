@@ -5,6 +5,7 @@
 #include <iostream>
 #include <LoggerAPI.h>
 #include <Utils/StringHelper.h>
+#include <Utils/FileHelper.h>
 #include <seh_exception/seh_exception.hpp>
 #include <ServerAPI.h>
 #include <HookAPI.h>
@@ -14,6 +15,7 @@
 #include "Main/CrashLogger.h"
 #include <TranslationAPI.h>
 #include <EventAPI.h>
+#include <LiteLoader/Main/Version.h>
 
 using namespace std;
 
@@ -100,6 +102,31 @@ void CheckRunningBDS()
     }
 }
 
+void FixAllowList()
+{
+    if (filesystem::exists("whitelist.json"))
+    {
+        if (filesystem::exists("allowlist.json"))
+        {
+            auto res = ReadAllFile("allowlist.json");
+            if (res && (* res == "" || *res == "[]"))
+            {
+                logger.warn("allowlist.json is empty! Removing...");
+                filesystem::remove("allowlist.json");
+            }
+            else
+            {
+                logger.warn("Both allowlist.json and whitelist.json exist and aren't empty. Please check them manually");
+                return;
+            }
+        }
+        std::error_code ec;
+        filesystem::copy_file("whitelist.json", "allowlist.json", filesystem::copy_options::overwrite_existing, ec);
+        filesystem::remove("whitelist.json", ec);
+        logger.warn("Renamed whitelist.json to allowlist.json");
+    }
+}
+
 extern void RegisterCommands();
 
 extern bool InitPlayerDatabase();
@@ -126,19 +153,18 @@ void Welcome()
 }
 
 void CheckDevMode() {
-    if (LL::globalConfig.debugMode) {
-        //logger.info("");
-        //logger.info("================= LiteLoader ================");
-        //logger.info(" ____             __  __           _      ");
-        //logger.info("|  _ \\  _____   _|  \\/  | ___   __| | ___ ");
-        //logger.info(R"(| | | |/ _ \ \ / / |\/| |/ _ \ / _` |/ _ \)");
-        //logger.info("| |_| |  __/\\ V /| |  | | (_) | (_| |  __/");
-        //logger.info(R"(|____/ \___| \_/ |_|  |_|\___/ \__,_|\___|)");
-        //logger.info("");
+    if (LL::globalConfig.debugMode)
         logger.warn("You Are In DevelopMode!");
-    }
 }
 
+void CheckBetaVersion()
+{
+    if (LITELOADER_VERSION_STATUS != LL::Version::Release)
+    {
+        logger.warn("You Are Using The Beta Version!");
+        logger.warn("DO NOT USE IN IN PRODUCTION ENVIRONMENT!!!");
+    }
+}
 // extern
 extern void EndScheduleSystem();
 extern void FixBugEvent();
@@ -162,6 +188,9 @@ void LLMain()
     FixUpCWD();
     FixPluginsLibDir();
 
+    // Check whether allowlist.json exists/is empty or not
+    FixAllowList();
+
     // Init LL Logger
     Logger::setDefaultFile("logs/LiteLoader-latest.log", false);
 
@@ -174,30 +203,30 @@ void LLMain()
     // Initialize Player Database
     InitPlayerDatabase();
 
-    //I18n
+    // I18n
     Translation::load("plugins/LiteLoader/LangPack/" + LL::globalConfig.language + ".json");
 
-    //Rename Window
+    // Rename Window
     HWND hwnd = GetConsoleWindow();
     std::wstring s = L"Bedrock Dedicated Server " + str2wstr(LL::getBdsVersion().substr(1));
     SetWindowText(hwnd, s.c_str());
 
-    //Welcome
+    // Welcome
     Welcome();
 
-    //DebugMode
+    // DebugMode
     CheckDevMode();
 
     // Builtin CrashLogger
     LL::InitCrashLogger(LL::globalConfig.enableCrashLogger);
 
-    //Register Myself
+    // Register Myself
     LL::registerPlugin("LiteLoaderBDS", "Strong DLL plugin loader for Bedrock Dedicated Server", LL::getLoaderVersion(),
     {
         {"GitHub","github.com/LiteLDev/LiteLoaderBDS"} 
     });
 
-    //Load plugins
+    // Load plugins
     LL::LoadMain();
 
     // Register built-in commands
@@ -206,9 +235,10 @@ void LLMain()
     // Register simple server logger
     RegisterSimpleServerLogger();
 
+    // Fix bug events
     FixBugEvent();
 
-    //Register Started
+    // Register Started
     Event::ServerStartedEvent::subscribe([](Event::ServerStartedEvent) {
         logger.info("LiteLoader is distributed under the GPLv3 License");
         logger.info("\u611f\u8c22\u65cb\u5f8b\u4e91 rhymc.com \u5bf9\u672c\u9879\u76ee\u7684\u652f\u6301");

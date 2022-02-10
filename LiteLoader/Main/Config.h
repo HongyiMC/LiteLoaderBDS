@@ -24,9 +24,7 @@ struct CommandLineOption
 };
 enum class SeverStatus
 {
-    Starting,
-    Running,
-    Stopping
+    Starting, Running, Stopping
 };
 struct LLConfig
 {
@@ -36,6 +34,10 @@ struct LLConfig
     std::string language = "en";
 
     bool enableScriptEngine = true;
+    bool alwaysLaunchScriptEngine = false;
+
+    bool enableAddonsHelper = true;
+    std::string addonsInstallPath = "plugins/AddonsHelper";
 
     bool enableAutoUpdate = true;
     bool enableCrashLogger = true;
