@@ -1,34 +1,32 @@
 # Documents: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 Language: Cpp
-# BasedOnStyle: LLVM
+BasedOnStyle: LLVM
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: false
-AlignConsecutiveDeclarations: false
-AlignEscapedNewlinesLeft: true
+AlignConsecutiveAssignments: None
+AlignConsecutiveDeclarations: None
 AlignOperands: Align
-AlwaysBreakTemplateDeclarations : true
+AlwaysBreakTemplateDeclarations : MultiLine
 AlignTrailingComments: true
 AllowAllArgumentsOnNextLine : true
 AllowAllParametersOfDeclarationOnNextLine: true
-AllowShortBlocksOnASingleLine : true
+AllowShortBlocksOnASingleLine : Always
 AllowShortCaseLabelsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: Inline
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: false
-AllowShortLambdasOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortLambdasOnASingleLine: All
 AllowShortEnumsOnASingleLine: false
 AlwaysBreakAfterDefinitionReturnType: None
 BinPackArguments: true
 BinPackParameters: true
 ConstructorInitializerIndentWidth: 0
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
-ColumnLimit: 0
+ColumnLimit: 120
 CommentPragmas: '^ IWYU pragma:'
 PointerAlignment: Left
 IndentWidth: 4
-SortIncludes: false
+SortIncludes: Never
 MaxEmptyLinesToKeep: 2
 SpacesInSquareBrackets: false
 SpacesInParentheses : false
@@ -36,6 +34,7 @@ SpaceBeforeAssignmentOperators: true
 SpacesInContainerLiterals: true
 IndentWrappedFunctionNames: true
 KeepEmptyLinesAtTheStartOfBlocks: true
+SeparateDefinitionBlocks: Always
 BreakConstructorInitializersBeforeComma: true
 SpaceAfterCStyleCast: false
 IndentCaseLabels: true
@@ -48,8 +47,6 @@ BraceWrapping:
   AfterCaseLabel: false
   # class定义后面
   AfterClass: false
-  # 控制语句后面
-  AfterControlStatement: false
   # enum定义后面
   AfterEnum: false
   # 函数定义后面
